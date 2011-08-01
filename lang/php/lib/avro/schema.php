@@ -443,7 +443,8 @@ class AvroSchema
         if (is_array($datum))
         {
           foreach ($expected_schema->fields() as $field)
-            if (!self::is_valid_datum($field->type(), $datum[$field->name()]))
+            if (!isset($datum[$field->name()]) 
+                || !self::is_valid_datum($field->type(), $datum[$field->name()]))
               return false;
           return true;
         }
