@@ -140,6 +140,107 @@ class AvroIO
 }
 
 /**
+ * AvroIO wrapper for stdout
+ * @package Avro
+ */
+class AvroStdout extends AvroIO
+{
+  /**
+   * @var boolean whether or not the output is closed.
+   */
+  private $is_closed;
+
+  public function __construct()
+  {
+    $this->is_closed = false;
+  }
+
+  /**
+   * Append bytes to this buffer.
+   * (Nothing more is needed to support Avro.)
+   * @param str $arg bytes to write
+   * @returns int count of bytes written.
+   * @throws AvroIOException if $args is not a string value.
+   */
+  public function write($arg)
+  {
+    $this->check_closed();
+    if (is_string($arg)) {
+      print $arg;
+    }else{
+      throw new AvroIOException(
+        sprintf('write argument must be a string: (%s) %s',
+                gettype($arg), var_export($arg, true)));
+    }
+  }
+
+  /**
+   * @returns string bytes read from buffer
+   * @todo test for fencepost errors wrt updating current_index
+   */
+  public function read($len)
+  {
+    throw new AvroIOException('Stdout only handles write, no read');
+  }
+
+  /**
+   * @returns boolean true if successful
+   * @throws AvroIOException if the seek failed.
+   */
+  public function seek($offset, $whence=self::SEEK_SET)
+  {
+    throw new AvroIOException('Stdout only handles write, no seek');
+  }
+
+  /**
+   * @returns int
+   * @see AvroIO::tell()
+   */
+  public function tell() { return 0; }
+
+  /**
+   * @returns boolean
+   * @see AvroIO::is_eof()
+   */
+  public function is_eof()
+  {
+    return False;
+  }
+
+  /**
+   * No-op provided for compatibility with AvroIO interface.
+   * @returns boolean true
+   */
+  public function flush() { flush(); return true; }
+
+  /**
+   * Marks this buffer as closed.
+   * @returns boolean true
+   */
+  public function close()
+  {
+    $this->check_closed();
+    $this->is_closed = true;
+    return true;
+  }
+
+  /**
+   * @throws AvroIOException if the buffer is closed.
+   */
+  private function check_closed()
+  {
+    if ($this->is_closed())
+      throw new AvroIOException('Buffer is closed');
+  }
+
+  /**
+   * @returns boolean true if this buffer is closed and false
+   *                       otherwise.
+   */
+  public function is_closed() { return $this->is_closed; }
+}
+
+/**
  * AvroIO wrapper for string access
  * @package Avro
  */
