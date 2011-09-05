@@ -442,10 +442,11 @@ class AvroSchema
       case self::REQUEST_SCHEMA:
         if (is_array($datum))
         {
-          foreach ($expected_schema->fields() as $field)
-            if (!isset($datum[$field->name()]) 
+          foreach ($expected_schema->fields() as $field) {
+            if (!array_key_exists($field->name(), $datum)
                 || !self::is_valid_datum($field->type(), $datum[$field->name()]))
               return false;
+          }
           return true;
         }
         return false;
